@@ -564,7 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        localStorage.setItem("userSession", JSON.stringify(data.user));
+        
 
         window.location.href = "index.html";
     });

@@ -128,10 +128,11 @@ document.getElementById('signinForm').addEventListener('submit', async function(
         localStorage.removeItem('rememberEmail');
     }
 
-    localStorage.setItem('userSession', JSON.stringify({
-        email,
-        loggedIn: true
-    }));
+  localStorage.setItem('userSession', JSON.stringify({
+    email,
+    name: user.user_metadata?.full_name || email.split("@")[0],
+    loggedIn: true
+}));
 
     window.location.replace('index.html');
 });
