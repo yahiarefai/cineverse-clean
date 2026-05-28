@@ -37,13 +37,14 @@
         }
     </script>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 mt-4">
         <h1 class="text-4xl font-bold mb-2" id="pageTitle">Select Your Seats</h1>
         <p class="text-gray-400 mb-8" id="pageSubtitle">Choose your seats in the immersive CineVerse auditorium.</p>
 
         <div class="relative mx-auto max-w-[1400px]">
 
-            <div class="mt-12 grid gap-4">
+            <div class="w-full overflow-x-auto pb-6 custom-scrollbar">
+                <div class="min-w-max px-4 mt-4 grid gap-4">
                 <div class="seat-row">
                     <span class="row-label">A</span>
                     <div class="row-seats" id="rowA"></div>
@@ -75,6 +76,7 @@
                 <div class="seat-row">
                     <span class="row-label">H</span>
                     <div class="row-seats" id="rowH"></div>
+                </div>
                 </div>
             </div>
 
