@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - CineVerse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-black text-white p-8 opacity-0 transition-opacity duration-500">
+
+    <div class="fixed top-6 left-6 z-50">
+        <button onclick="goBack()" class="group flex items-center space-x-2 text-white bg-black bg-opacity-40 hover:bg-opacity-80 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 transition-all duration-300 hover:border-red-600 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+            <span class="transform transition-transform duration-300 group-hover:-translate-x-1 text-xl group-hover:text-red-500">←</span>
+            <span class="font-bold uppercase tracking-widest text-sm group-hover:text-red-500">Back</span>
+        </button>
+    </div>
+
+    <div class="max-w-2xl mx-auto pt-24 px-4">
+        <h1 class="text-3xl font-bold mb-8 text-center">My Bookings</h1>
+        <div id="bookingsList">
+        </div>
+    </div>
+
+    <script>
+        // 1. حركة الظهور عند فتح الصفحة
+        window.addEventListener('load', () => {
+            document.body.classList.remove('opacity-0');
+            document.body.classList.add('opacity-100');
+        });
+
+        // 2. حركة الاختفاء عند كبس زر الرجوع
+        function goBack() {
+            document.body.classList.remove('opacity-100');
+            document.body.classList.add('opacity-0');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 400);
+        }
+
+        // 3. كود جلب الحجوزات
+        document.addEventListener('DOMContentLoaded', () => {
+            const bookings = JSON.parse(localStorage.getItem('bookingsDB') || '[]');
+            const container = document.getElementById('bookingsList');
+            if (bookings.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400">No bookings found.</p>';
+            } else {
+                container.innerHTML = bookings.map(b => `
+    <div class="bg-[#111] border border-[#222] p-8 rounded-lg mb-4 hover:border-gray-700 transition">
+        <h2 class="text-xl font-bold text-white">${b.movie}</h2>
+        <p class="text-gray-400 text-sm mt-1">${b.date} | ${b.time}</p>
+        <div class="mt-4 text-red-500 font-bold text-lg">${b.total} JOD</div>
+    </div>
+`).join('');
+            }
+        });
+    </script>
+</body>
+</html>

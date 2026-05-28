@@ -1,0 +1,544 @@
+/* Custom small styles for CineVerse */
+
+/* Page transitions */
+body {
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  animation: fadeInPage 0.45s ease forwards;
+}
+
+body.fade-out {
+  opacity: 0;
+  transform: translateY(-24px);
+}
+
+@keyframes fadeInPage {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fade-in animation for smaller cards */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeInUp 700ms ease both;
+}
+
+/* Cinema seat layout */
+.seat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.seat-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.seat-row {
+  display: grid;
+  grid-template-columns: minmax(40px, auto) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.row-label {
+  color: #cbd5e1;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+.row-seats {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.seat-btn {
+  width: 64px;
+  height: 56px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: #e2e8f0;
+  transition: transform 0.22s cubic-bezier(.2,.9,.2,1), box-shadow 0.22s ease;
+  position: relative;
+  overflow: visible;
+  z-index: 40;
+}
+
+.seat-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 1;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.6));
+}
+
+.seat-btn::before { content: none; }
+
+.seat-btn .seat-number {
+  position: relative;
+  z-index: 45;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+.seat-btn:hover:not(:disabled) {
+  transform: translateY(-6px) scale(1.02);
+}
+
+.seat-btn:hover:not(:disabled)::after {
+  content: attr(data-price);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.36rem 0.88rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: rgba(17, 24, 39, 0.96);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+}
+
+.seat-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.seat-btn.selected {
+  box-shadow: 0 18px 60px rgba(220,20,60,0.28), 0 6px 22px rgba(0,0,0,0.6);
+  transform: translateY(-8px) scale(1.04);
+}
+
+/* give selected seats a red overlay */
+.seat-btn.selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(220,20,60,0.18), rgba(220,20,60,0.08));
+  pointer-events: none;
+  z-index: 44;
+}
+
+.cinema-screen {
+  width: min(96%, 1240px);
+  height: 120px;
+  margin: 2rem auto 0;
+  border-radius: 220px 220px 60px 60px / 140px 140px 40px 40px;
+  background: radial-gradient(1200px 300px at 50% 10%, rgba(255,255,255,0.95), rgba(255,255,255,0.12) 25%, rgba(255,255,255,0.02) 45%),
+              linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow: 0 0 160px rgba(255,255,255,0.35), inset 0 0 60px rgba(255,255,255,0.18);
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.cinema-screen::before {
+  content: 'SCREEN';
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 1;
+}
+
+.cinema-screen::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -16px;
+  width: 260%;
+  height: 120px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 60%);
+  filter: blur(32px);
+}
+
+.booking-bar {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(90deg, #fada4c, #ec9d05);
+  border-radius: 28px;
+  box-shadow: 0 30px 80px rgba(249, 115, 22, 0.22);
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 70;
+}
+
+.booking-bar.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 110px;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(15, 23, 42, 0.95);
+  color: #f8fafc;
+  padding: 0.9rem 1.2rem;
+  border-radius: 9999px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 75;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.hidden {
+  display: none;
+}
+
+.screen-shelf {
+  display: none;
+}
+
+.screen-shelf-inner {
+  width: min(96%, 1200px);
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.08);
+  padding: 1rem 0;
+  box-shadow: 0 0 80px rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.screen-shelf-inner .screen-label {
+  display: block;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.bottom-basket {
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
+}
+
+.bottom-basket.active {
+  transform: translateY(0);
+}
+
+.bottom-basket {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 60;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(90deg, #f6c21d, #f59e0b);
+  box-shadow: 0 -20px 60px rgba(249, 115, 22, 0.22);
+}
+
+.bottom-basket-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.bottom-basket .basket-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: #111827;
+  font-weight: 700;
+}
+
+.bottom-basket .basket-info span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.bottom-basket button {
+  min-width: 180px;
+}
+
+.payment-method-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148,163,184,0.16);
+  background: #ffffff;
+  color: #111827;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.payment-method-btn.selected,
+.payment-method-btn:hover {
+  border-color: #b91c1c;
+  color: #b91c1c;
+  box-shadow: 0 18px 40px rgba(185,28,28,0.14);
+}
+
+/* Pay button transition state */
+.pay-button {
+  background: #9ca3af; /* muted gray when inactive */
+  transition: background-color 300ms ease, transform 150ms ease, box-shadow 200ms ease;
+}
+.pay-button.active {
+  background: #b91c1c; /* brand red */
+  box-shadow: 0 18px 40px rgba(185,28,28,0.18);
+  transform: translateY(-1px);
+}
+
+.card-brand-logo {
+  opacity: 0.35;
+  filter: grayscale(80%);
+  transition: opacity 180ms ease, transform 180ms ease, filter 180ms ease;
+}
+.card-brand-logo.active-card {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.05);
+}
+
+.signin-box {
+  max-width: 480px !important;
+  width: 90%;
+  margin: 0 auto !important;
+  height: auto;
+  padding: 40px;
+}
+
+.signin-container {
+  height: auto;
+  padding-bottom: 50px;
+}
+
+.signin-container .brand-header {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+/* Form internals: flush-left column layout */
+#signinForm label,
+#signinForm .input-group,
+#signinForm .remember-forgot,
+#signinForm .remember-row,
+#signinForm > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure inputs fill the available width */
+#signinForm input,
+.signin-box input,
+.signin-box .password-input,
+.signin-box .signin-submit-btn {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.signin-container .password-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+}
+
+/* explicit toggle icon positioning */
+#togglePassword {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  cursor: pointer;
+  color: #a0aec0;
+}
+
+.fade-out,
+.fade-out-page {
+  opacity: 0;
+  transform: translateY(-24px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 1024px) {
+  .row-seats {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .seat-row {
+    grid-template-columns: 1fr;
+  }
+  .row-label {
+    text-align: left;
+  }
+  .seat-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Signup form adjustments to prevent footer overflow and ensure spacing */
+.signup-box {
+  display: flex;
+  flex-direction: column;
+  padding: 32px 24px 40px;
+  min-height: 100%;
+  overflow-y: visible;
+}
+
+.signup-box form,
+.signin-box form {
+  gap: 0.5rem !important;
+}
+
+.signin-box input,
+.signin-box textarea,
+.signin-box select {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+
+.signup-box {
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.signup-box a {
+  display: inline-block;
+}
+
+.password-input {
+  padding-right: 2.5rem !important;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.password-toggle-icon:hover {
+  color: #f87171;
+}
+
+.brand-header {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #ef4444, #ec4899);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
+#signinForm input[type="email"],
+#signinForm input[type="password"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 10px 15px !important;
+  margin: 0 !important;
+  display: block !important;
+  border-width: 1px !important;
+  border-color: rgba(148,163,184,0.35) !important;
+  text-align: left !important;
+}
+
+.signup-footer-link {
+  margin-top: 20px !important;
+  display: block;
+  text-align: center;
+  color: #60a5fa; /* blue-400 */
+}
+.signup-footer-link:hover { color: #3b82f6; }
+
+.logo {
+  width: 60px !important;
+  margin-bottom: 5px !important;
+}
+
+.form-logo img,
+.signup-logo img,
+.logo img {
+  width: 80px !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  display: block !important;
+}
+ /* SWIPER PAGINATION STYLE */
+.swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.4);
+    opacity: 1;
+    border-radius: 50%;
+    margin: 0 6px !important;
+    transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+    background: #ff3b3b;
+    width: 18px;
+    border-radius: 10px;
+    transform: scale(1.2);
+    box-shadow: 0 0 12px rgba(255, 59, 59, 0.6);
+}

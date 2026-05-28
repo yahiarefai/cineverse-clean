@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CineVerse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* تأثيرات الدخول والخروج للصفحة (Page Transitions) */
+        body {
+            opacity: 0;
+            animation: fadeInPage 0.6s ease-out forwards;
+        }
+        .fade-out-page {
+            animation: fadeOutPage 0.5s ease-in forwards !important;
+        }
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOutPage {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white overflow-x-hidden overflow-y-auto">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-8 relative z-10">
+        <div class="w-full max-w-md animate-fadeIn">
+            <div class="text-center mb-10">
+                <h1 class="brand-header">CineVerse</h1>
+            </div>
+
+            <div class="bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-gray-700 signup-box">
+                <h2 class="text-3xl font-bold mb-2 text-center">Create Account</h2>
+
+                <form id="signupForm" class="flex flex-col gap-2">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium mb-2">Full Name</label>
+                        <input type="text" id="fullName" required placeholder="Yahia Rifai" class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium mb-2">Email Address</label>
+                        <input type="email" id="email" required placeholder="you@example.com" class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium mb-2">Phone Number</label>
+                        <input type="tel" id="phone" required placeholder="07XXXXXXXX" class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                    </div>
+
+                    <div>
+                        <label for="age" class="block text-sm font-medium mb-2">Age</label>
+                        <input type="number" id="age" required min="13" max="120" placeholder="20" class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 password-input bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                            <i class="fa-solid fa-eye-slash password-toggle-icon" data-toggle="password" data-target="password" title="Show/Hide password"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium mb-2">Confirm Password</label>
+                        <div class="relative">
+                            <input type="password" id="confirmPassword" required placeholder="••••••••" class="w-full px-4 py-3 password-input bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition">
+                            <i class="fa-solid fa-eye-slash password-toggle-icon" data-toggle="password" data-target="confirmPassword" title="Show/Hide password"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 py-3 rounded-lg font-bold text-lg transition transform hover:scale-105 mt-8 flex justify-center items-center">
+                        <span>Create Account</span>
+                    </button>
+                </form>
+
+                <div class="relative my-8">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-700"></div></div>
+                    <div class="relative flex flex-col items-center gap-2 text-sm">
+                        <span class="px-2 bg-gray-800 text-gray-400">Already have an account?</span>
+                        <a href="signin.html" onclick="transitionTo(event, 'signin.html')" class="text-red-500 hover:text-red-400 font-semibold">
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <p class="text-center text-xs text-gray-400 mt-4">© 2026 CineVerse. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. إعدادات Supabase ---
+        // استبدل هذه القيم بالـ URL والـ Anon Key الخاصين بمشروعك في Supabase
+        
+
+        // --- 2. دالة الانتقال السلس بين الصفحات (Page Transitions) ---
+        function transitionTo(event, url) {
+            if(event) event.preventDefault();
+            document.body.classList.add('fade-out-page');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 450); // نفس مدة الـ animation
+        }
+
+      var supabaseUrl = 'https://ectftbenssqjnjbjiati.supabase.co';
+      var supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjdGZ0YmVuc3Nxam5qYmppYXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzE0ODIsImV4cCI6MjA5NDk0NzQ4Mn0.2kWHuS41qV5Hi4Mfid9kn5bD_4u-MyqTvA5Q1I0DExA';
+      var supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Password toggle removed from inline script; handled globally in script.js
+        
+        // --- 4. معالجة التسجيل مع Supabase ---
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            console.log("FORM SUBMITTED");
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value.trim();
+            const age = document.getElementById('age').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const submitBtn = document.getElementById('submitBtn');
+            
+           const phone = document.getElementById('phone').value.trim();
+           const phonePattern = /^07\d{8}$/;
+
+            if (password !== confirmPassword) {
+                alert('❌ Passwords do not match!');
+                return;
+            }
+            if (password.length < 6) {
+                alert('❌ Password must be at least 6 characters long.');
+                return;
+            }
+            if (age < 13) {
+                alert('❌ You must be at least 13 years old to register.');
+                return;
+            }
+            if (!phonePattern.test(phone)) {
+                alert('❌ Phone number must start with 07 and contain 9 digits total.');
+                return;
+            }
+            
+            // تغيير شكل الزر للتحميل
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span class="ml-2">Processing...</span>';
+            submitBtn.disabled = true;
+
+            try {
+                // استدعاء Supabase لإنشاء الحساب وإرسال إيميل التأكيد
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            age: age,
+                            phone: phone
+                        },
+                        // هذا الرابط هو الذي سيعود إليه المستخدم بعد الضغط على Confirm في الإيميل
+                        emailRedirectTo: 'http://127.0.0.1:5500/confirm-email.html'
+                    }
+                });
+
+                if (error) throw error;
+
+// حفظ الحساب داخل localStorage
+const usersDB = JSON.parse(localStorage.getItem("usersDB")) || [];
+
+usersDB.push({
+    name: fullName,
+    lastname: "",
+    email: email,
+    password: password
+});
+
+// احفظ الحسابات الجديدة
+localStorage.setItem("usersDB", JSON.stringify(usersDB));
+
+                alert(`📧 Success! A confirmation link has been sent to ${email}. Please check your inbox to activate your account.`);
+                transitionTo(null, 'signin.html');
+
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+                submitBtn.innerHTML = '<span>Create Account</span>';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

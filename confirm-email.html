@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmed - CineVerse</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* أنيميشن مخصص لظهور علامة الصح الزرقاء بشكل سلس */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-popIn {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white overflow-hidden opacity-0 transition-opacity duration-500">
+    
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center px-4 relative z-10">
+        <div class="w-full max-w-md">
+            <h1 class="text-4xl font-bold text-red-600 mb-8 text-center animate-fadeIn">CineVerse</h1>
+            
+            <div class="bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700 p-8 text-center">
+                <div style="max-width: 360px; margin: 0 auto; width: 100%;" class="py-4">
+                    
+                    <div class="mb-6 flex justify-center opacity-0 animate-popIn">
+                        <i class="fa-solid fa-circle-check text-blue-500 text-7xl filter drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"></i>
+                    </div>
+
+                    <h2 class="text-3xl font-bold mb-2">Success!</h2>
+                    <p class="text-xl text-blue-400 font-semibold mb-6 tracking-wide uppercase">email confirmed !</p>
+                    
+                    <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+                        Your account has been successfully verified. You are now ready to dive in and book tickets for your favorite movies.
+                    </p>
+
+                    <button onclick="window.location.href='signin.html'" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 py-3 rounded-lg font-bold text-lg transition transform hover:scale-105 shadow-lg hover:shadow-red-600/30">
+                        Continue to Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://ectftbenssqjnjbjiati.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjdGZ0YmVuc3Nxam5qYmppYXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzE0ODIsImV4cCI6MjA5NDk0NzQ4Mn0.2kWHuS41qV5Hi4Mfid9kn5bD_4u-MyqTvA5Q1I0DExA';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // دالة حركة الظهور (Fade In) للموقع عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            document.body.classList.remove('opacity-0');
+            document.body.classList.add('opacity-100');
+        });
+
+        // دالة الانتقال السلس (Fade Out) عند الضغط على زر التوجيه
+        function transitionTo(url) {
+            document.body.style.opacity = "0";
+            setTimeout(() => {
+                window.location.href = url;
+            }, 450);
+        }
+    </script>
+</body>
+</html>

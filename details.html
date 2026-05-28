@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details - CineVerse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="fixed top-6 left-6 z-50">
+    <button onclick="window.location.href='index.html'"
+            class="group flex items-center space-x-2 text-white bg-black bg-opacity-40 hover:bg-opacity-80 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 transition-all duration-300 ease-out hover:border-red-500 hover:scale-105 active:scale-95">
+        
+        <span class="transform transition-transform duration-300 group-hover:-translate-x-1 text-xl">←</span>
+        
+        <span class="font-bold uppercase tracking-widest text-sm">Back</span>
+    </button>
+</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+            const nameDisplay = document.getElementById('navUserName');
+            if (session && session.email) {
+                const extractedName = session.name || "Yahia Rifai";
+                if(nameDisplay) nameDisplay.textContent = extractedName;
+            }
+        });
+        function logout() {
+            localStorage.removeItem('userSession');
+            window.location.href = 'signin.html';
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+            const nameDisplay = document.getElementById('navUserName');
+            if (session && session.email) {
+                const extractedName = session.name || "Yahia Rifai";
+                if(nameDisplay) nameDisplay.textContent = extractedName;
+            }
+        });
+        function logout() {
+            localStorage.removeItem('userSession');
+            window.location.href = 'signin.html';
+        }
+    </script>
+
+    <section class="py-12 bg-gray-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
+                <div class="relative w-full bg-black" style="padding-bottom: 56.25%;">
+                    <iframe 
+    id="trailerFrame"
+    class="absolute top-0 left-0 w-full h-full"
+    src=""
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+</iframe>
+                </div>
+
+                <div class="p-8">
+                    <h1 id="movieTitle" class="text-4xl font-bold mb-2">Loading...</h1>
+                    <p class="text-gray-400 text-sm mb-6">Select a Date and Showtime to continue.</p>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-4 text-gray-300">1. Select Date</h3>
+                        <div id="dateCards" class="flex gap-4 overflow-x-auto pb-2">
+                            </div>
+                    </div>
+
+                    <div id="showtimesContainer" class="mb-8 hidden transition-all duration-500 opacity-0 transform translate-y-4">
+                        <h3 class="text-xl font-bold mb-4 text-gray-300">2. Available Times</h3>
+                        <div id="timesGrid" class="flex gap-3 flex-wrap">
+                            </div>
+                    </div>
+
+                    <div class="flex gap-4 mt-8 pt-6 border-t border-gray-700">
+                        <button id="proceedBtn" onclick="proceedToSeats()" disabled class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-8 py-3 rounded-lg font-bold text-lg transition flex-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                            🎟️ Select Seats
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Load Movie Data
+        const movieDataStr = localStorage.getItem('selectedMovie');
+        let selectedMovieTitle = "Unknown";
+        if (movieDataStr) {
+            const movieData = JSON.parse(movieDataStr);
+            selectedMovieTitle = movieData.title;
+            document.getElementById('movieTitle').textContent = movieData.title;
+            document.getElementById('trailerFrame').src = movieData.trailerUrl;
+        }
+
+        // Generate Dates & Times Logic
+        let chosenDate = null;
+        let chosenTime = null;
+        const timeSlots = ["14:30", "15:30", "17:00", "18:00", "19:30", "20:30", "22:00", "23:00"];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateCards = document.getElementById('dateCards');
+            const today = new Date();
+            
+            // توليد 4 أيام قادمة
+            for(let i=0; i<4; i++){
+                let d = new Date(today);
+                d.setDate(today.getDate() + i);
+                
+                let dayName = d.toLocaleDateString('en-US', {weekday: 'short'});
+                let dayNum = d.getDate();
+                let fullDateStr = d.toISOString().split('T')[0];
+                let isToday = (i === 0);
+
+                let btn = document.createElement('button');
+                btn.className = `flex flex-col items-center justify-center min-w-[80px] py-3 rounded-xl border border-gray-600 bg-gray-700 hover:border-red-500 transition date-btn`;
+                btn.innerHTML = `<span class="text-xs text-gray-400">${dayName}</span><span class="text-xl font-bold">${dayNum}</span>`;
+                
+                btn.onclick = () => selectDate(btn, fullDateStr, isToday);
+                dateCards.appendChild(btn);
+            }
+        });
+
+        function selectDate(btn, dateStr, isToday) {
+            if (chosenDate === dateStr) {
+                chosenDate = null;
+                chosenTime = null;
+                document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('border-red-500', 'bg-red-900', 'bg-opacity-20'));
+                const container = document.getElementById('showtimesContainer');
+                const grid = document.getElementById('timesGrid');
+                grid.innerHTML = '';
+                container.classList.add('hidden', 'opacity-0', 'translate-y-4');
+                checkProceedBtn();
+                return;
+            }
+
+            document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('border-red-500', 'bg-red-900', 'bg-opacity-20'));
+            btn.classList.add('border-red-500', 'bg-red-900', 'bg-opacity-20');
+            chosenDate = dateStr;
+            chosenTime = null;
+            checkProceedBtn();
+
+            const container = document.getElementById('showtimesContainer');
+            const grid = document.getElementById('timesGrid');
+            grid.innerHTML = '';
+            
+            // إظهار قسم الأوقات بحركة ناعمة
+            container.classList.remove('hidden');
+            setTimeout(() => container.classList.remove('opacity-0', 'translate-y-4'), 50);
+
+            // جلب وقت الجهاز الحالي
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMin = now.getMinutes();
+
+            timeSlots.forEach(time => {
+                const [h, m] = time.split(':').map(Number);
+                // الفحص الذكي: هل الوقت مضى بالنسبة لليوم؟
+                const isPast = isToday && ((h < currentHour) || (h === currentHour && m <= currentMin));
+                
+                let tBtn = document.createElement('button');
+                if (isPast) {
+                    tBtn.className = "px-6 py-2 rounded-lg border border-gray-700 bg-gray-800 text-gray-500 cursor-not-allowed opacity-50";
+                    tBtn.title = "Showtime has passed";
+                    tBtn.innerText = time;
+                } else {
+                    tBtn.className = "px-6 py-2 rounded-lg border border-gray-600 bg-gray-700 text-white hover:border-red-500 transition time-btn";
+                    tBtn.innerText = time;
+                    tBtn.onclick = () => selectTime(tBtn, time);
+                }
+                grid.appendChild(tBtn);
+            });
+        }
+
+        function selectTime(btn, time) {
+            if (chosenTime === time) {
+                chosenTime = null;
+                btn.classList.remove('border-red-500', 'bg-red-600');
+                checkProceedBtn();
+                return;
+            }
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('border-red-500', 'bg-red-600'));
+            btn.classList.add('border-red-500', 'bg-red-600');
+            chosenTime = time;
+            checkProceedBtn();
+        }
+
+        function checkProceedBtn() {
+            const btn = document.getElementById('proceedBtn');
+            btn.disabled = !(chosenDate && chosenTime);
+        }
+
+        function proceedToSeats() {
+            // حفظ معلومات الفيلم والتاريخ والوقت للمرحلة القادمة
+            const sessionData = {
+                title: selectedMovieTitle,
+                date: chosenDate,
+                time: chosenTime
+            };
+            localStorage.setItem('bookingSession', JSON.stringify(sessionData));
+            transitionTo('seats.html');
+        }
+
+        function transitionTo(url) {
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

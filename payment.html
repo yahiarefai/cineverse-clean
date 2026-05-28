@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEPS Payment Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen flex flex-col">
+    <header class="bg-[#b91c1c] text-white p-6 shadow-md flex justify-between items-center">
+        <div class="max-w-6xl mx-auto w-full flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-black tracking-tighter uppercase">meps</h1>
+                <p class="text-xs tracking-widest font-bold opacity-80 mt-1">CINEVERSE SECURE GATEWAY</p>
+            </div>
+            <button onclick="transitionTo('seats.html')" class="text-white hover:text-gray-200 transition font-bold text-sm bg-white/10 px-4 py-2 rounded-lg border border-white/20">
+                Cancel & Go Back
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center py-12 px-4">
+        <div class="bg-white max-w-lg w-full rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.12)] border border-gray-200 overflow-hidden animate-fadeIn">
+            <div class="bg-gradient-to-r from-[#fee2e2] via-white to-[#fee2e2] p-8 text-center border-b border-gray-200">
+                <p class="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Secure Checkout</p>
+                <h2 class="text-5xl font-black text-[#b91c1c]" id="mepsTotal">JOD 0.000</h2>
+                <!-- clean header: only Secure Checkout and total price (no seat metadata) -->
+            </div>
+
+            <div class="p-8 space-y-6">
+                <div class="mb-2 text-sm text-gray-600 font-semibold">Payment method: Credit / Debit Card</div>
+
+                <form id="mepsForm" class="space-y-5">
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Cardholder Name</label>
+                        <input id="cardholderName" type="text" placeholder="YAHIA LUAi AWNI RIFAI" required class="w-full p-4 rounded-3xl bg-gray-50 border border-gray-300 focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition text-gray-800 font-medium">
+                        <p id="nameError" class="mt-2 text-sm text-red-600 hidden">Please enter a valid full name (First and Last).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Card Number</label>
+                        <div class="relative w-full">
+                            <input id="card-number" type="text" placeholder="1234 1234 1234 1234" maxlength="19" required class="w-full p-4 pr-16 rounded-3xl bg-gray-50 border border-gray-300 focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition text-gray-800 font-medium text-lg tracking-widest">
+                            <img id="cardTypeIcon" src="images/visa.png" alt="Card Type" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 hidden object-contain">
+                        </div>
+                        <p id="cardNumberError" class="mt-2 text-sm text-red-600 hidden">Invalid card number.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Expiry Date</label>
+                            <input id="expiryDate" type="text" placeholder="MM/YY" maxlength="5" required class="w-full p-4 rounded-3xl bg-gray-50 border border-gray-300 focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition text-gray-800 font-medium text-center">
+                            <p id="expiryError" class="mt-2 text-sm text-red-600 hidden">Card is expired or invalid.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">CVV</label>
+                            <input id="cvv" type="password" placeholder="•••" maxlength="3" required class="w-full p-4 rounded-3xl bg-gray-50 border border-gray-300 focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition text-gray-800 font-bold text-center text-xl tracking-widest">
+                            <p id="cvvError" class="mt-2 text-sm text-red-600 hidden">CVV must be 3 digits.</p>
+                        </div>
+                    </div>
+
+                    <button id="payButton" type="submit" disabled class="w-full pay-button text-white py-4 rounded-3xl font-black text-lg transition transform shadow-lg uppercase tracking-widest">
+                        Pay Now
+                    </button>
+                    
+                    <button id="billingToggle" type="button" class="mt-3 text-sm text-left text-gray-600 font-semibold">Edit billing info</button>
+                    <div id="billingFields" class="mt-3 space-y-3 hidden">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Full Name</label>
+                            <input id="billingName" type="text" placeholder="Yahia Rifai" class="w-full p-3 rounded-2xl bg-gray-50 border border-gray-300 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Email</label>
+                            <input id="billingEmail" type="email" placeholder="you@domain.com" class="w-full p-3 rounded-2xl bg-gray-50 border border-gray-300 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Billing Address</label>
+                            <input id="billingAddress" type="text" placeholder="123 Main St" class="w-full p-3 rounded-2xl bg-gray-50 border border-gray-300 focus:outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">City</label>
+                                <input id="billingCity" type="text" placeholder="Amman" class="w-full p-3 rounded-2xl bg-gray-50 border border-gray-300 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Area Code</label>
+                                <input id="billingAreaCode" type="text" placeholder="11118" class="w-full p-3 rounded-2xl bg-gray-50 border border-gray-300 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-gray-50 p-4 text-center text-xs text-gray-500 font-medium border-t border-gray-200">
+                <div class="flex items-center justify-center gap-6 mb-2">
+                  <img src="images/visa.png" alt="Visa" class="h-6 object-contain">
+                  <img src="images/mastercard.png" alt="Mastercard" class="h-6 object-contain">
+                    <!-- PCI-DSS SVG -->
+                    <svg width="90" height="20" viewBox="0 0 90 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="90" height="20" rx="3" fill="#111827"/><text x="10" y="13" fill="#fff" font-family="Arial" font-size="8" font-weight="700">PCI-DSS COMPLIANT</text></svg>
+                </div>
+                🔒 Secured by MEPS encryption standards
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. قائمة بأشهر بدايات بطاقات البنوك والمحافظ الأردنية (زين كاش، أورانج، إلخ)
+        const jordanianBINs = ['4220', '4176', '4238', '5326', '5169', '5322', '5351', '5595', '4123', '5241', '4000', '5000'];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const rawTotal = localStorage.getItem('checkoutTotal') || '0';
+            const bookedSeats = JSON.parse(localStorage.getItem('checkoutSeats') || '[]');
+
+            document.getElementById('mepsTotal').textContent = `JOD ${parseInt(rawTotal).toFixed(3)}`;
+
+            const inputs = ['cardholderName', 'card-number', 'expiryDate', 'cvv'];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', updatePayButtonState);
+                }
+            });
+
+            // --- القفز التلقائي من خانة الاسم (عند الضغط على Enter) ---
+            const nameEl = document.getElementById('cardholderName');
+            if (nameEl) {
+                nameEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); 
+                        document.getElementById('card-number').focus(); 
+                    }
+                });
+            }
+
+            // --- رقم البطاقة: الأيقونة + القفز التلقائي للتاريخ ---
+            const cardEl = document.getElementById('card-number');
+            const cardIcon = document.getElementById('cardTypeIcon'); 
+
+            if(cardEl){
+                cardEl.addEventListener('input', (e)=>{
+                    let v = e.target.value.replace(/[^0-9]/g, '').slice(0,16); 
+                    const parts = [];
+                    for(let i=0;i<v.length;i+=4) parts.push(v.slice(i,i+4));
+                    e.target.value = parts.join(' ');
+                    
+                    if(v.length >= 4){
+                        if(v.startsWith("4")){
+                            cardIcon.src = "images/visa.png";
+                            cardIcon.classList.remove('hidden'); 
+                        } 
+                        else if(/^5[1-5]/.test(v) || /^2(2[2-9]|[3-6]|7[01])/.test(v)){
+                            cardIcon.src = "images/mastercard.png";
+                            cardIcon.classList.remove('hidden'); 
+                        } 
+                        else {
+                            cardIcon.classList.add('hidden'); 
+                        }
+                    } else {
+                        cardIcon.classList.add('hidden');
+                    }
+
+                    // سحر القفز التلقائي: 16 رقم + 3 مسافات = 19
+                    if(e.target.value.length === 19) {
+                        document.getElementById('expiryDate').focus();
+                    }
+
+                    updatePayButtonState();
+                });
+            }
+
+            // --- تاريخ الانتهاء: القفز التلقائي للـ CVV ---
+            const expiryEl = document.getElementById('expiryDate');
+            if(expiryEl){
+                expiryEl.addEventListener('input', (e)=>{
+                    let v = e.target.value.replace(/[^0-9]/g, '').slice(0,4);
+                    if(v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+                    e.target.value = v;
+
+                    // سحر القفز التلقائي: بس تكتمل الخمس خانات MM/YY
+                    if(e.target.value.length === 5) {
+                        document.getElementById('cvv').focus();
+                    }
+
+                    updatePayButtonState();
+                });
+            }
+
+            const billingToggle = document.getElementById('billingToggle');
+            if(billingToggle){
+                billingToggle.addEventListener('click', ()=>{
+                    const bf = document.getElementById('billingFields');
+                    if(bf) bf.classList.toggle('hidden');
+                });
+            }
+
+            updatePayButtonState();
+        });
+
+        function luhnCheck(num){
+            let sum = 0; let alt = false;
+            for(let i = num.length - 1; i >= 0; i--){
+                let n = parseInt(num.charAt(i),10);
+                if(alt){ n *= 2; if(n>9) n -= 9; }
+                sum += n; alt = !alt;
+            }
+            return sum % 10 === 0;
+        }
+
+        // --- فحص البيانات الشامل (مع فلترة البنوك الأردنية) ---
+        function isPaymentDetailsValid() {
+            const name = (document.getElementById('cardholderName') || {}).value.trim() || '';
+            const cardNumber = (document.getElementById('card-number') || {}).value.replace(/\s+/g, '') || '';
+            const expiry = (document.getElementById('expiryDate') || {}).value || '';
+            const cvv = (document.getElementById('cvv') || {}).value || '';
+
+            // 1. الاسم
+            const nameValid = /^[a-zA-Z\s]{5,}$/.test(name) && name.includes(' ');
+            const nameErrorEl = document.getElementById('nameError');
+            if (nameErrorEl) {
+                if (name.length > 0 && !nameValid) nameErrorEl.classList.remove('hidden');
+                else nameErrorEl.classList.add('hidden');
+            }
+
+            // 2. رقم البطاقة + فحص إذا كانت أردنية
+            const cardLenValid = /^\d{16}$/.test(cardNumber);
+            const cardLuhn = cardLenValid && luhnCheck(cardNumber);
+            const cardPrefix = cardNumber.substring(0, 4);
+            
+            // نعتبر أي بطاقة بتبدأ بـ 4 أو 5 أردنية كفحص مبدئي، وتقدر تحددها أكثر من الأراي فوق
+            const isJordanian = jordanianBINs.includes(cardPrefix) || cardPrefix.startsWith('4') || cardPrefix.startsWith('5');
+
+            const cardErrorEl = document.getElementById('cardNumberError');
+            if (cardErrorEl) {
+                if (cardNumber.length >= 16) {
+                    if (!cardLuhn) {
+                        cardErrorEl.innerText = "Invalid card number.";
+                        cardErrorEl.classList.remove('hidden');
+                    } else if (!isJordanian) {
+                        cardErrorEl.innerText = "Only Jordanian Banks, Zain Cash, or Orange Money accepted.";
+                        cardErrorEl.classList.remove('hidden');
+                    } else {
+                        cardErrorEl.classList.add('hidden');
+                    }
+                } else {
+                    cardErrorEl.classList.add('hidden');
+                }
+            }
+
+            // 3. التاريخ
+            const expiryFormatValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiry);
+            let expiryNotExpired = false;
+            if (expiryFormatValid) {
+                const [month, year] = expiry.split('/').map(num => parseInt(num, 10));
+                const now = new Date();
+                const expiryDate = new Date(2000 + year, month - 1, 1);
+                expiryNotExpired = expiryDate >= new Date(now.getFullYear(), now.getMonth(), 1);
+            }
+            const expiryValid = expiryFormatValid && expiryNotExpired;
+            const expiryErrorEl = document.getElementById('expiryError');
+            if (expiryErrorEl) {
+                if (expiry.length === 5 && !expiryValid) expiryErrorEl.classList.remove('hidden');
+                else expiryErrorEl.classList.add('hidden');
+            }
+
+            // 4. CVV
+            const cvvValid = /^\d{3}$/.test(cvv);
+            const cvvErrorEl = document.getElementById('cvvError');
+            if (cvvErrorEl) {
+                if (cvv.length > 0 && !cvvValid) cvvErrorEl.classList.remove('hidden');
+                else cvvErrorEl.classList.add('hidden');
+            }
+
+            return nameValid && cardLenValid && cardLuhn && isJordanian && expiryValid && cvvValid;
+        }
+
+        function updatePayButtonState() {
+            const payButton = document.getElementById('payButton');
+            const valid = isPaymentDetailsValid();
+            if (payButton) {
+                payButton.disabled = !valid;
+                payButton.classList.toggle('active', valid);
+            }
+        }
+
+        // --- محاكاة إرسال الدفع للبنك ---
+        document.getElementById('mepsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!isPaymentDetailsValid()) return;
+
+            const payButton = document.getElementById('payButton');
+            if (payButton) {
+                payButton.disabled = true;
+                payButton.textContent = 'Processing...'; // ببلش تحميل
+            }
+
+            // محاكاة الاتصال بسيرفر البنك (تأخير ثانية ونص)
+            setTimeout(() => {
+                const cvvValue = (document.getElementById('cvv') || {}).value;
+
+                // نظام الـ Test Mode: البنك بيقبل فقط CVV 123
+                if (cvvValue !== '123') {
+                    alert('❌ Transaction Declined: Invalid CVV provided by your bank.');
+                    
+                    if (payButton) {
+                        payButton.disabled = false;
+                        payButton.textContent = 'Pay Now';
+                        payButton.classList.add('active');
+                    }
+                    return; 
+                }
+
+                const sessionData = JSON.parse(localStorage.getItem('bookingSession') || '{}');
+                const bookedSeats = JSON.parse(localStorage.getItem('checkoutSeats') || '[]');
+                const rawTotal = localStorage.getItem('checkoutTotal');
+
+                if (sessionData.title && bookedSeats.length > 0) {
+                    let db = JSON.parse(localStorage.getItem('bookingsDB') || '[]');
+                    db.push({
+                        movie: sessionData.title,
+                        date: sessionData.date,
+                        time: sessionData.time,
+                        seats: bookedSeats,
+                        totalPaid: rawTotal,
+                        paymentMethod: 'card',
+                        bookingId: 'MEPS-' + Math.floor(Math.random() * 1000000)
+                    });
+                    localStorage.setItem('bookingsDB', JSON.stringify(db));
+
+                    alert(`✅ Payment Approved! Transaction successful for JOD ${parseInt(rawTotal).toFixed(3)}.`);
+                    transitionTo('index.html');
+                } else {
+                    alert('Session expired. Please try again.');
+                    transitionTo('index.html');
+                }
+            }, 1500); 
+        });
+
+        function transitionTo(url) {
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
+        }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

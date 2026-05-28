@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - CineVerse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white overflow-x-hidden overflow-y-auto">
+    <!-- Animated background elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-8 relative z-10">
+        <div class="w-full max-w-md">
+            <h1 class="text-4xl font-bold text-red-600 mb-8 mt-12 animate-fadeIn text-center">CineVerse</h1>
+            <!-- Sign In Card -->
+            <div class="bg-gray-800 bg-opacity-50 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700 signin-box signin-container">
+                <div style="max-width: 360px; margin: 0 auto; width: 100%;">
+                    <h2 class="text-3xl font-bold mb-2 text-center">Welcome Back</h2>
+                    <p class="text-gray-400 text-center mb-8">Sign in to your CineVerse account</p>
+
+                    <form id="signinForm" class="space-y-4 text-left">
+                    <!-- Email -->
+                    <div class="w-full text-left">
+                        <label for="email" class="block text-sm font-medium mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            required
+                            placeholder="you@example.com" 
+                            class="w-full px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg"
+                            style="width: 100%; text-align: left;"
+                        >
+                    </div>
+
+                    <!-- Password -->
+                    <div class="w-full text-left">
+                        <label for="password" class="block text-sm font-medium mb-2">Password</label>
+                        <div style="position: relative; width: 100%;">
+                            <input type="password" id="password" name="password" required placeholder="••••••••" style="width: 100%; padding-right: 45px; text-align: left;" class="px-4 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg">
+ <i class="fa-solid fa-eye-slash password-toggle-icon"
+   data-target="password">
+</i>
+                        </div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                  <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; margin: 16px 0 24px 0;">
+    
+<label style="display: flex; flex-direction: row; align-items: center; gap: 8px; width: max-content; cursor: pointer; margin: 0;">
+    <span style="font-size: 14px; color: #d1d5db; white-space: nowrap;">Remember me</span>
+    <input type="checkbox" id="rememberMe"
+    style="width: 14px; height: 14px; cursor: pointer;">
+</label>
+    
+    <a href="#" onclick="handleForgotPassword(event)" style="font-size: 14px; color: #ef4444; text-decoration: none; white-space: nowrap;">Forgot Password?</a>
+
+</div>
+
+                    <!-- Sign In Button -->
+                    <button type="submit" id="signinSubmit" class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 py-3 rounded-lg font-bold text-lg transition transform hover:scale-105 mt-6">Sign In</button>
+                </form>
+
+                <!-- Divider -->
+                <div class="relative my-8">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-gray-800 text-gray-400">Don't have an account?</span>
+                    </div>
+                </div>
+
+                <!-- Create New Account Button -->
+                <a href="signup.html" onclick="transitionTo('signup.html'); return false;" class="block text-center w-full bg-gray-700 hover:bg-gray-600 py-3 rounded-lg font-semibold transition">
+                    Create New Account
+                </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Text - Outside and Below the Box -->
+    <div class="fixed bottom-8 left-0 right-0 flex justify-center pointer-events-none">
+        <p class="text-center text-xs text-gray-500 mt-2 mb-4">
+            By signing in, you agree to our Terms of Service and Privacy Policy
+        </p>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://ectftbenssqjnjbjiati.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjdGZ0YmVuc3Nxam5qYmppYXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNzE0ODIsImV4cCI6MjA5NDk0NzQ4Mn0.2kWHuS41qV5Hi4Mfid9kn5bD_4u-MyqTvA5Q1I0DExA';
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+document.getElementById('signinForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const rememberMe = document.getElementById('rememberMe').checked;
+
+    const submitBtn = document.getElementById('signinSubmit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Loading...';
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        alert("❌ " + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+        return;
+    }
+
+    // remember me (اختياري)
+    if (rememberMe) {
+        localStorage.setItem('rememberEmail', email);
+    } else {
+        localStorage.removeItem('rememberEmail');
+    }
+
+    localStorage.setItem('userSession', JSON.stringify({
+        email,
+        loggedIn: true
+    }));
+
+    window.location.replace('index.html');
+});
+
+    </script>
+    <script>
+document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+
+    icon.addEventListener('click', () => {
+
+        const targetId = icon.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+
+        if (!input) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+
+    });
+
+});
+</script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
