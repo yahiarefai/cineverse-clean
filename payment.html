@@ -45,7 +45,8 @@
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Card Number</label>
                         <div class="relative w-full">
                             <input id="card-number" type="text" placeholder="1234 1234 1234 1234" maxlength="19" required class="w-full p-4 pr-16 rounded-3xl bg-gray-50 border border-gray-300 focus:outline-none focus:border-[#b91c1c] focus:ring-1 focus:ring-[#b91c1c] transition text-gray-800 font-medium text-lg tracking-widest">
-                            <img id="cardTypeIcon" src="images/visa.png" alt="Card Type" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 hidden object-contain">
+                            <img id="visaIcon" src="/images/visa.png" alt="Visa" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 hidden object-contain">
+                            <img id="mastercardIcon" src="/images/mastercard.png" alt="Mastercard" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 hidden object-contain">
                         </div>
                         <p id="cardNumberError" class="mt-2 text-sm text-red-600 hidden">Invalid card number.</p>
                     </div>
@@ -96,8 +97,8 @@
             </div>
             <div class="bg-gray-50 p-4 text-center text-xs text-gray-500 font-medium border-t border-gray-200">
                 <div class="flex items-center justify-center gap-6 mb-2">
-                  <img src="images/visa.png" alt="Visa" class="h-6 object-contain">
-                  <img src="images/mastercard.png" alt="Mastercard" class="h-6 object-contain">
+                  <img src="/images/visa.png" alt="Visa" class="h-6 object-contain">
+                  <img src="/images/mastercard.png" alt="Mastercard" class="h-6 object-contain">
                     <!-- PCI-DSS SVG -->
                     <svg width="90" height="20" viewBox="0 0 90 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="90" height="20" rx="3" fill="#111827"/><text x="10" y="13" fill="#fff" font-family="Arial" font-size="8" font-weight="700">PCI-DSS COMPLIANT</text></svg>
                 </div>
@@ -137,7 +138,8 @@
 
             // --- رقم البطاقة: الأيقونة + القفز التلقائي للتاريخ ---
             const cardEl = document.getElementById('card-number');
-            const cardIcon = document.getElementById('cardTypeIcon'); 
+            const visaIcon = document.getElementById('visaIcon');
+            const mastercardIcon = document.getElementById('mastercardIcon');
 
             if (cardEl) {
 
@@ -148,33 +150,22 @@
         // format card number
         e.target.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
 
-        // VISA
-if (v.length >= 4 && v.startsWith('4')) {
+        // hide icons by default
+        if (visaIcon) visaIcon.classList.add('hidden');
+        if (mastercardIcon) mastercardIcon.classList.add('hidden');
 
-    cardIcon.src = "images/visa.png";
-    cardIcon.classList.remove('hidden');
-
-}
-
-// MASTERCARD
-else if (
-    v.length >= 4 &&
-    (
-        /^5[1-5]/.test(v) ||
-        /^2(2[2-9]|[3-7][0-9])/.test(v)
-    )
-) {
-
-    cardIcon.src = "images/mastercard.png";
-    cardIcon.classList.remove('hidden');
-
-}
-
-        // UNKNOWN
-        else {
-
-            cardIcon.classList.add('hidden');
-
+        if (v.length >= 4) {
+            // VISA
+            if (v.startsWith('4')) {
+                if (visaIcon) visaIcon.classList.remove('hidden');
+            }
+            // MASTERCARD
+            else if (
+                /^5[1-5]/.test(v) ||
+                /^2(2[2-9]|[3-7][0-9])/.test(v)
+            ) {
+                if (mastercardIcon) mastercardIcon.classList.remove('hidden');
+            }
         }
 
         // auto focus
